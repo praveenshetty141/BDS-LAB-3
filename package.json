@@ -1,0 +1,24 @@
+{
+  "name": "lab-03",
+  "version": "1.0.0",
+  "description": "Express Lab 3 - Clean REST API with Filtering, Sorting, Validation, and Debugging Exercise",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "dev": "nodemon index.js",
+    "test": "node test_routes.js",
+    "debug-broken": "node debugging_exercise/broken_app.js",
+    "debug-fixed": "node debugging_exercise/fixed_app.js"
+  },
+  "keywords": ["express", "sqlite", "rest-api", "validation", "filtering", "pagination"],
+  "author": "PANDIRI SUMANTH (252U1R9117)",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0",
+    "nodemon": "^3.1.14",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1"
+  }
+}
+

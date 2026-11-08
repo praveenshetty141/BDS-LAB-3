@@ -1,0 +1,7 @@
+# Use this workspace to collaborate
+workspace:
+  id: a0b1c6f8-d013-4d1f-8e76-13453402b75f
+
+localResources:
+  collections:
+    - ../Express_Lab3_Postman_Collection.json

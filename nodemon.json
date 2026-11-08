@@ -1,0 +1,5 @@
+{
+  "watch": ["index.js", "debugging_exercise/**"],
+  "ignore": ["*.db", "*.db*", "test_routes.js", "node_modules/**", "screenshots/**"]
+}
+

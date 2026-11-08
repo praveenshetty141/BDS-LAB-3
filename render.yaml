@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: bdf-lab-03-sumanth
+    env: node
+    plan: free
+    region: oregon
+    rootDir: lab-03
+    buildCommand: npm install && npm rebuild sqlite3 --build-from-source
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production

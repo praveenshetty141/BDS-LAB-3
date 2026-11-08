@@ -1,0 +1,847 @@
+{
+  "info": {
+    "name": "Express Lab 3 - Clean REST API with Filtering, Sorting, Validation, and Debugging",
+    "description": "Postman Collection for Express Lab 3 covering RESTful CRUD, query filters (search_q, order_by, order, limit, offset, min_price, max_price), request body validation, and standard HTTP status codes. Run it top to bottom with the Collection Runner: request 09 saves the new book id in {{bookId}} and requests 10, 12 and 13 use it.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "bookId",
+      "value": "11",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. GET /books - All Books (Default Parameters)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Returns an array', () => pm.expect(json).to.be.an('array'));",
+              "pm.test('Default limit of 10 respected', () => pm.expect(json.length).to.be.at.most(10));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02. GET /books - Search with LIKE (?search_q=Gatsby)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Every title contains Gatsby', () => json.forEach(b => pm.expect(b.title).to.include('Gatsby')));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?search_q=Gatsby",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "search_q",
+              "value": "Gatsby"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "03. GET /books - Sorting (?order_by=price&order=DESC&limit=4)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Sorted by price high to low', () => { const p = json.map(b => b.price); pm.expect(p).to.eql([...p].sort((a, b) => b - a)); });",
+              "pm.test('At most 4 rows', () => pm.expect(json.length).to.be.at.most(4));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?order_by=price&order=DESC&limit=4",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "order_by",
+              "value": "price"
+            },
+            {
+              "key": "order",
+              "value": "DESC"
+            },
+            {
+              "key": "limit",
+              "value": "4"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "04. GET /books - Price Range Filter (?min_price=250&max_price=350)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('All prices within 250-350', () => json.forEach(b => pm.expect(b.price).to.be.within(250, 350)));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?min_price=250&max_price=350",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "min_price",
+              "value": "250"
+            },
+            {
+              "key": "max_price",
+              "value": "350"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "05. GET /books - Pagination (?limit=2&offset=2)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Page size is 2', () => pm.expect(json.length).to.eql(2));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?limit=2&offset=2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "2"
+            },
+            {
+              "key": "offset",
+              "value": "2"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "06. GET /books/:bookId - Single Book by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Correct book returned', () => pm.expect(json.id).to.eql(1));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07. POST /books - Validation Error 400 (Missing Title)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions title', () => pm.expect(json.message).to.include('title'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"author\": \"Unknown Author\",\n  \"price\": 199\n}"
+        }
+      }
+    },
+    {
+      "name": "08. POST /books - Validation Error 400 (Non-Numeric Price)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions price', () => pm.expect(json.message).to.include('price'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"price\": \"Free\"\n}"
+        }
+      }
+    },
+    {
+      "name": "09. POST /books - Create New Book (201 Created)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('bookId returned', () => pm.expect(json.bookId).to.be.a('number'));",
+              "pm.collectionVariables.set('bookId', json.bookId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"price\": 450,\n  \"pages\": 464\n}"
+        }
+      }
+    },
+    {
+      "name": "10. PUT /books/:bookId - Update Existing Book (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Success message', () => pm.expect(json.message).to.eql('Book updated successfully'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books/{{bookId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "{{bookId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Clean Code (2nd Edition)\",\n  \"author\": \"Robert C. Martin\",\n  \"price\": 499,\n  \"pages\": 480\n}"
+        }
+      }
+    },
+    {
+      "name": "11. PUT /books/:bookId - Non-Existent Book (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Not found message', () => pm.expect(json.message).to.eql('Book not found'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "99999"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Ghost Book\",\n  \"author\": \"Nobody\",\n  \"price\": 100\n}"
+        }
+      }
+    },
+    {
+      "name": "12. DELETE /books/:bookId - Delete Book (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Success message', () => pm.expect(json.message).to.eql('Book deleted successfully'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/{{bookId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "{{bookId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "13. GET /books/:bookId - Verify Deleted (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Not found message', () => pm.expect(json.message).to.eql('Book not found'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/{{bookId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "{{bookId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "14. GET /books - Invalid order_by (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions order_by', () => pm.expect(json.message).to.include('order_by'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?order_by=password",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "order_by",
+              "value": "password"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "15. GET /books - Invalid limit (?limit=0) (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions limit', () => pm.expect(json.message).to.include('limit'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?limit=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "16. GET /books - min_price greater than max_price (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions min_price', () => pm.expect(json.message).to.include('min_price'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?min_price=500&max_price=100",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "min_price",
+              "value": "500"
+            },
+            {
+              "key": "max_price",
+              "value": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "17. GET /books/:bookId - Non-Numeric ID (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions book ID', () => pm.expect(json.message).to.include('book ID'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/abc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "abc"
+          ]
+        }
+      }
+    },
+    {
+      "name": "18. GET /books/:bookId - Missing Record (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Not found message', () => pm.expect(json.message).to.eql('Book not found'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "99999"
+          ]
+        }
+      }
+    },
+    {
+      "name": "19. DELETE /books/:bookId - Non-Existent Book (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Not found message', () => pm.expect(json.message).to.eql('Book not found'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            "99999"
+          ]
+        }
+      }
+    },
+    {
+      "name": "20. POST /books - Validation Error 400 (Missing Author)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions author', () => pm.expect(json.message).to.include('author'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"No Author Book\",\n  \"price\": 100\n}"
+        }
+      }
+    },
+    {
+      "name": "21. POST /books - Validation Error 400 (Missing Price)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Message mentions price', () => pm.expect(json.message).to.include('price'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Free Book\",\n  \"author\": \"Someone\"\n}"
+        }
+      }
+    },
+    {
+      "name": "22. POST /books - Malformed JSON (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Invalid JSON message', () => pm.expect(json.message).to.eql('Invalid JSON in request body.'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"title\": \"Broken\", "
+        }
+      }
+    },
+    {
+      "name": "23. GET /unknown - Undefined Route (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+              "const json = pm.response.json();",
+              "pm.test('Error uses the { message } format', () => pm.expect(json.message).to.be.a('string'));",
+              "pm.test('Route not found message', () => pm.expect(json.message).to.eql('Route not found'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/unknown",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "unknown"
+          ]
+        }
+      }
+    }
+  ]
+}
