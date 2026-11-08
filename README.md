@@ -1,4 +1,4 @@
-# Lab 3: REST API, query parameters, validation, debugging
+# BDS-LAB-3: REST API, query parameters, validation, debugging
 
 **Pendyala Praveen Kumar** · **252U1R9123** · **111 CSE GEN-AI 2B**
 
