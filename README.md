@@ -5,7 +5,7 @@
 ---
 
 ### Live Link
-- **🌐 Live Deployed API (Render):** 
+- **🌐 Live Deployed API (Render):** https://bds-lab-3-2.onrender.com
 
 ---
 
